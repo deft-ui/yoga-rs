@@ -575,9 +575,6 @@ impl Node {
         unsafe { internal::YGNodeStyleGetOverflow(self.inner_node).into() }
     }
 
-    pub fn get_flex(&self) -> f32 {
-        unsafe { internal::YGNodeStyleGetFlex(self.inner_node) }
-    }
     pub fn get_flex_grow(&self) -> f32 {
         unsafe { internal::YGNodeStyleGetFlexGrow(self.inner_node) }
     }
