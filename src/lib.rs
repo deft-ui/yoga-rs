@@ -47,6 +47,7 @@ pub mod types;
 
 pub use crate::types::*;
 use std::any::Any;
+use crate::internal::YGDisplay;
 
 #[repr(C)]
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -522,6 +523,10 @@ impl Node {
         }
     }
 
+    pub fn get_display(&self) -> YGDisplay {
+        unsafe { internal::YGNodeStyleGetDisplay(self.inner_node)}
+    }
+
     pub fn get_child_count(&self) -> u32 {
         unsafe { internal::YGNodeGetChildCount(self.inner_node) }
     }
@@ -566,6 +571,9 @@ impl Node {
         unsafe { internal::YGNodeStyleGetOverflow(self.inner_node).into() }
     }
 
+    pub fn get_flex(&self) -> f32 {
+        unsafe { internal::YGNodeStyleGetFlex(self.inner_node) }
+    }
     pub fn get_flex_grow(&self) -> f32 {
         unsafe { internal::YGNodeStyleGetFlexGrow(self.inner_node) }
     }
