@@ -4,6 +4,8 @@ extern crate cc;
 use bindgen::{NonCopyUnionStyle, RustTarget};
 use cc::Build;
 use std::{env, path::PathBuf, process::Command};
+use std::fs::File;
+use std::io::Write;
 
 fn main() {
     println!("cargo:rerun-if-changed=src/yoga/yoga");
@@ -20,7 +22,7 @@ fn main() {
     Build::new()
 		.cpp(true)
 		// https://github.com/facebook/yoga/blob/c5f826de8306e5fbe5963f944c75add827e096c3/BUCK#L13
-		.flag("-std=c++11")
+		.flag("-std=c++20")
 		// https://github.com/facebook/yoga/blob/c5f826de8306e5fbe5963f944c75add827e096c3/yoga_defs.bzl#L49-L56
 		.flag("-fno-omit-frame-pointer")
 		.flag("-fexceptions")
@@ -31,25 +33,33 @@ fn main() {
 		// Include path
 		.include("src/yoga")
 		// C++ Files
-		.file("src/yoga/yoga/event/event.cpp")
-		.file("src/yoga/yoga/internal/experiments.cpp")
-		.file("src/yoga/yoga/log.cpp")
-		.file("src/yoga/yoga/Utils.cpp")
-		.file("src/yoga/yoga/YGConfig.cpp")
-		.file("src/yoga/yoga/YGEnums.cpp")
-		.file("src/yoga/yoga/YGLayout.cpp")
-		.file("src/yoga/yoga/YGNode.cpp")
-		.file("src/yoga/yoga/YGNodePrint.cpp")
-		.file("src/yoga/yoga/YGStyle.cpp")
 		.file("src/yoga/yoga/YGValue.cpp")
-		.file("src/yoga/yoga/Yoga.cpp")
+		.file("src/yoga/yoga/config/Config.cpp")
+		.file("src/yoga/yoga/YGEnums.cpp")
+		.file("src/yoga/yoga/YGNodeLayout.cpp")
+		.file("src/yoga/yoga/algorithm/AbsoluteLayout.cpp")
+		.file("src/yoga/yoga/algorithm/PixelGrid.cpp")
+		.file("src/yoga/yoga/algorithm/Baseline.cpp")
+		.file("src/yoga/yoga/algorithm/CalculateLayout.cpp")
+		.file("src/yoga/yoga/algorithm/FlexLine.cpp")
+		.file("src/yoga/yoga/algorithm/Cache.cpp")
+		.file("src/yoga/yoga/event/event.cpp")
+		.file("src/yoga/yoga/YGPixelGrid.cpp")
+		.file("src/yoga/yoga/YGNode.cpp")
+		.file("src/yoga/yoga/debug/Log.cpp")
+		.file("src/yoga/yoga/debug/AssertFatal.cpp")
+		.file("src/yoga/yoga/YGConfig.cpp")
+		.file("src/yoga/yoga/YGNodeStyle.cpp")
+		.file("src/yoga/yoga/node/LayoutResults.cpp")
+		.file("src/yoga/yoga/node/Node.cpp")
 		.compile("libyoga.a");
 
     let bindings = bindgen::Builder::default()
-        .rust_target(RustTarget::Stable_1_47)
+        .rust_target(RustTarget::Stable_1_64)
         .clang_arg("--language=c++")
         .clang_arg("-std=c++11")
         .clang_arg("-stdlib=libc++")
+		.clang_arg("-Isrc/yoga")
         .no_convert_floats()
         .enable_cxx_namespaces()
         .allowlist_type("YG.*")
@@ -66,5 +76,13 @@ fn main() {
 
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
 
-    bindings.write_to_file(out_path.join("bindings.rs")).expect("Unable to write bindings!");
+	let bindings_content = bindings.to_string()
+		.replace(
+			"pub const YGUndefined: ::std::os::raw::c_float = ::std::f64::NAN;",
+			"pub const YGUndefined: ::std::os::raw::c_float = ::std::f32::NAN;"
+		);
+
+	let mut bind_file = File::create(out_path.join("bindings.rs")).unwrap();
+	bind_file.write_all(bindings_content.as_bytes()).expect("Unable to write bindings!");
+    // bindings.write_to_file().expect("Unable to write bindings!");
 }

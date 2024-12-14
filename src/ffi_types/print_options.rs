@@ -9,12 +9,12 @@ pub enum PrintOptions {
     Children = 4,
 }
 
-impl From<PrintOptions> for internal::YGPrintOptions {
-    fn from(p: PrintOptions) -> internal::YGPrintOptions {
-        match p {
-            PrintOptions::Layout => internal::YGPrintOptions::YGPrintOptionsLayout,
-            PrintOptions::Style => internal::YGPrintOptions::YGPrintOptionsStyle,
-            PrintOptions::Children => internal::YGPrintOptions::YGPrintOptionsChildren,
-        }
-    }
-}
+// impl From<PrintOptions> for internal::YGPrintOptions {
+//     fn from(p: PrintOptions) -> internal::YGPrintOptions {
+//         match p {
+//             PrintOptions::Layout => internal::YGPrintOptions::YGPrintOptionsLayout,
+//             PrintOptions::Style => internal::YGPrintOptions::YGPrintOptionsStyle,
+//             PrintOptions::Children => internal::YGPrintOptions::YGPrintOptionsChildren,
+//         }
+//     }
+// }

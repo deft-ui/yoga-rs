@@ -47,7 +47,7 @@ pub mod types;
 
 pub use crate::types::*;
 use std::any::Any;
-use crate::internal::YGDisplay;
+use crate::internal::{root, YGDisplay};
 
 #[repr(C)]
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -167,7 +167,7 @@ impl Node {
         }
     }
 
-    pub fn insert_child(&mut self, child: &mut Node, index: u32) {
+    pub fn insert_child(&mut self, child: &mut Node, index: usize) {
         unsafe {
             internal::YGNodeInsertChild(self.inner_node, child.inner_node, index);
         }
@@ -179,7 +179,7 @@ impl Node {
         }
     }
 
-    pub fn child_count(&self) -> u32 {
+    pub fn child_count(&self) -> usize {
         unsafe { internal::YGNodeGetChildCount(self.inner_node) }
     }
 
@@ -527,11 +527,11 @@ impl Node {
         unsafe { internal::YGNodeStyleGetDisplay(self.inner_node)}
     }
 
-    pub fn get_child_count(&self) -> u32 {
+    pub fn get_child_count(&self) -> usize {
         unsafe { internal::YGNodeGetChildCount(self.inner_node) }
     }
 
-    pub fn get_child(&self, index: u32) -> NodeRef {
+    pub fn get_child(&self, index: usize) -> NodeRef {
         unsafe { internal::YGNodeGetChild(self.inner_node, index) }
     }
 
@@ -958,11 +958,11 @@ impl Node {
         match func {
             Some(f) => unsafe {
                 type Callback = unsafe extern "C" fn(
-                    internal::YGNodeRef,
-                    f32,
-                    internal::YGMeasureMode,
-                    f32,
-                    internal::YGMeasureMode,
+                    node: internal::YGNodeConstRef,
+                    width: f32,
+                    widthMode: internal::YGMeasureMode,
+                    height: f32,
+                    heightMode: internal::YGMeasureMode,
                 ) -> internal::YGSize;
                 let casted_func: Callback = std::mem::transmute(f as usize);
                 internal::YGNodeSetMeasureFunc(self.inner_node, Some(casted_func));
@@ -976,7 +976,7 @@ impl Node {
     pub fn set_baseline_func(&mut self, func: BaselineFunc) {
         match func {
             Some(f) => unsafe {
-                type Callback = unsafe extern "C" fn(internal::YGNodeRef, f32, f32) -> f32;
+                type Callback = unsafe extern "C" fn(node: root::YGNodeConstRef, width: f32, height: f32) -> f32;
                 let casted_func: Callback = std::mem::transmute(f as usize);
                 internal::YGNodeSetBaselineFunc(self.inner_node, Some(casted_func));
             },
