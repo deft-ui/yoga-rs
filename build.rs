@@ -4,8 +4,6 @@ extern crate cc;
 use bindgen::{NonCopyUnionStyle, RustTarget};
 use cc::Build;
 use std::{env, path::PathBuf, process::Command};
-use std::fs::File;
-use std::io::Write;
 
 fn main() {
     println!("cargo:rerun-if-changed=src/yoga/yoga");
@@ -64,7 +62,7 @@ fn main() {
         .enable_cxx_namespaces()
         .allowlist_type("YG.*")
         .allowlist_function("YG.*")
-        .allowlist_var("YG.*")
+        // .allowlist_var("YG.*")
         .layout_tests(false)
         .rustfmt_bindings(true)
         .rustified_enum("YG.*")
@@ -76,13 +74,5 @@ fn main() {
 
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
 
-	let bindings_content = bindings.to_string()
-		.replace(
-			"pub const YGUndefined: ::std::os::raw::c_float = ::std::f64::NAN;",
-			"pub const YGUndefined: ::std::os::raw::c_float = ::std::f32::NAN;"
-		);
-
-	let mut bind_file = File::create(out_path.join("bindings.rs")).unwrap();
-	bind_file.write_all(bindings_content.as_bytes()).expect("Unable to write bindings!");
-    // bindings.write_to_file().expect("Unable to write bindings!");
+    bindings.write_to_file(out_path.join("bindings.rs")).expect("Unable to write bindings!");
 }

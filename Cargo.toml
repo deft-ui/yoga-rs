@@ -1,5 +1,5 @@
 [package]
-name = "lento-yoga"
+name = "deft-yoga"
 description = "Rust bindings for Facebook's Yoga, a Flexbox layout engine"
 license = "MIT"
 repository = "https://github.com/bschwind/yoga-rs"
