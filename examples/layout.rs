@@ -1,7 +1,7 @@
 #[macro_use]
-extern crate yoga;
+extern crate deft_yoga;
 
-use yoga::{
+use deft_yoga::{
     prelude::*,
     Node,
     StyleUnit::{Auto, UndefinedValue},
@@ -34,7 +34,7 @@ fn main() {
     child.apply_styles(&child_styles);
     other_child.apply_styles(&child_styles);
 
-    node.calculate_layout(512.0, 512.0, yoga::Direction::LTR);
+    node.calculate_layout(512.0, 512.0, deft_yoga::Direction::LTR);
 
     println!("Layout is {:#?}", child.get_layout());
 }

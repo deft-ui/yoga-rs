@@ -17,17 +17,20 @@ fn main() {
         .status()
         .expect("Unable to update the submodule repositories");
 
-    Build::new()
-		.cpp(true)
+    let mut build = Build::new();
+	build.cpp(true)
 		// https://github.com/facebook/yoga/blob/c5f826de8306e5fbe5963f944c75add827e096c3/BUCK#L13
-		.flag("-std=c++20")
+        .std("c++20");
+	#[cfg(not(target_os = "windows"))]
+	build
 		// https://github.com/facebook/yoga/blob/c5f826de8306e5fbe5963f944c75add827e096c3/yoga_defs.bzl#L49-L56
 		.flag("-fno-omit-frame-pointer")
 		.flag("-fexceptions")
-		.flag("-Wall")
 		.flag("-O3")
 		// https://github.com/facebook/yoga/blob/c5f826de8306e5fbe5963f944c75add827e096c3/yoga_defs.bzl#L58-L60
 		.flag("-fPIC")
+	;
+    build.warnings(false)
 		// Include path
 		.include("src/yoga")
 		// C++ Files
@@ -55,7 +58,7 @@ fn main() {
     let bindings = bindgen::Builder::default()
         .rust_target(RustTarget::Stable_1_64)
         .clang_arg("--language=c++")
-        .clang_arg("-std=c++11")
+        .clang_arg("-std=c++14")
         .clang_arg("-stdlib=libc++")
 		.clang_arg("-Isrc/yoga")
         .no_convert_floats()
