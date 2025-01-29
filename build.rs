@@ -58,7 +58,7 @@ fn main() {
     let bindings = bindgen::Builder::default()
         .rust_target(RustTarget::Stable_1_64)
         .clang_arg("--language=c++")
-        .clang_arg("-std=c++14")
+        .clang_arg("-std=c++20")
         .clang_arg("-stdlib=libc++")
 		.clang_arg("-Isrc/yoga")
         .no_convert_floats()
