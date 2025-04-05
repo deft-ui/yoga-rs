@@ -1,8 +1,10 @@
+use strum_macros::{Display, EnumString};
 use crate::internal;
 
 #[repr(u32)]
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Copy, Clone, Display, EnumString)]
 #[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
+#[strum(ascii_case_insensitive, serialize_all= "kebab-case")]
 pub enum Wrap {
     NoWrap = 0,
     Wrap = 1,

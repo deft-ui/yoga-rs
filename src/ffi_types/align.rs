@@ -1,8 +1,11 @@
+use std::str::FromStr;
+use strum_macros::{Display, EnumString};
 use crate::internal;
 
 #[repr(u32)]
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Copy, Clone, Display, EnumString)]
 #[cfg_attr(feature = "serde_support", derive(Serialize, Deserialize))]
+#[strum(ascii_case_insensitive, serialize_all= "kebab-case")]
 pub enum Align {
     Auto = 0,
     FlexStart = 1,
@@ -45,4 +48,12 @@ impl From<internal::YGAlign> for Align {
             internal::YGAlign::YGAlignSpaceEvenly => Align::SpaceEvenly,
         }
     }
+}
+
+
+#[test]
+fn test_strum() {
+    let e = Align::FlexStart;
+    assert_eq!(e.to_string(), "flex-start");
+    assert_eq!(Align::from_str("Flex-start").unwrap(), Align::FlexStart);
 }
