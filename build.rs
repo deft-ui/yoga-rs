@@ -3,7 +3,7 @@ extern crate cc;
 
 use bindgen::{NonCopyUnionStyle, RustTarget};
 use cc::Build;
-use std::{env, path::PathBuf, process::Command};
+use std::{env, fs, path::PathBuf, process::Command};
 
 fn main() {
     println!("cargo:rerun-if-changed=src/yoga/yoga");
@@ -65,6 +65,7 @@ fn main() {
 		.compile("libyoga.a");
 
 	let mut bindgen_builder = bindgen::Builder::default()
+		.detect_include_paths(true)
 		.rust_target(RustTarget::Stable_1_64)
 		.clang_arg("--language=c++")
 		.clang_arg("-std=c++20")
@@ -72,7 +73,9 @@ fn main() {
 		.clang_arg("-Isrc/yoga");
 	if target_os == "emscripten" {
 		let emsdk = env::var("EMSDK").expect("EMSDK environment variable not set");
-		bindgen_builder = bindgen_builder.clang_arg(&format!("-I{}/upstream/emscripten/system/lib/libcxx/include", emsdk));
+		let include_path = format!("-I{}/upstream/emscripten/system/lib/libcxx/include", emsdk);
+		println!("Add EMSDK include path: {}", fs::exists(&include_path).unwrap());
+		bindgen_builder = bindgen_builder.clang_arg(&include_path);
 	}
     let bindings = bindgen_builder
         .no_convert_floats()
