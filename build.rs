@@ -69,13 +69,13 @@ fn main() {
 		.rust_target(RustTarget::Stable_1_64)
 		.clang_arg("--language=c++")
 		.clang_arg("-std=c++20")
-		.clang_arg("-stdlib=libc++")
+		// .clang_arg("-stdlib=libc++")
 		.clang_arg("-Isrc/yoga");
 	if target_os == "emscripten" {
 		let emsdk = env::var("EMSDK").expect("EMSDK environment variable not set");
-		let include_path = format!("-I{}/upstream/emscripten/system/lib/libcxx/include", emsdk);
-		println!("Add EMSDK include path: {}", fs::exists(&include_path).unwrap());
-		bindgen_builder = bindgen_builder.clang_arg(&include_path);
+		let include_path = format!("{}/upstream/emscripten/system/lib/libcxx/include", emsdk);
+		println!("Add EMSDK include path: {} {}", fs::exists(&include_path).unwrap(), include_path);
+		bindgen_builder = bindgen_builder.clang_arg(&format!("-I{}", include_path));
 	}
     let bindings = bindgen_builder
         .no_convert_floats()
